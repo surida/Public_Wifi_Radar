@@ -10,6 +10,14 @@
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
 	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Need location to show nearby WiFi spots.</string>
+	<key>io.flutter.embedded_views_preview</key>
+	<true/>
+	<!-- Google Maps API Key not strictly needed in Info.plist for iOS anymore via plugin, 
+	     but usually done in AppDelegate.swift for recent versions. 
+	     However, let's keep it safe. Actually, the plugin docs say to put it in AppDelegate.
+	     But for now, let's remove the Naver key. -->
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
