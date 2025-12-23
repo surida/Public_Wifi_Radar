@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:public_wifi_radar/screens/map_screen.dart';
+import 'package:public_wifi_radar/services/log_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await LogService().init();
   runApp(const MyApp());
 }
 

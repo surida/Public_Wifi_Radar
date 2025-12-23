@@ -4,6 +4,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:public_wifi_radar/models/wifi_info.dart';
 import 'package:public_wifi_radar/services/csv_service.dart';
+import 'package:public_wifi_radar/services/log_service.dart';
 
 class MapScreen extends StatefulWidget {
   const MapScreen({super.key});
@@ -31,49 +32,88 @@ class _MapScreenState extends State<MapScreen> {
   }
 
   Future<void> _initializeData() async {
-    // 1. Request Location Permission
-    LocationPermission permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-    }
+    // 1. Load CSV Data
+    final csvService = CsvService();
+    final data = await csvService.loadWifiData();
+    LogService().log("CSV Data Loaded: ${data.length} items");
+    
+    setState(() => _wifiList = data);
 
-    if (permission == LocationPermission.deniedForever || permission == LocationPermission.denied) {
-       // Handle permission denied
-       if (mounted) {
-         setState(() => _isLoading = false);
-       }
-       return;
-    }
-
-    // 2. Get Current Location
     try {
-      Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high,
-      );
+        // 2. Request Location Permission (with timeout)
+        LogService().log("Checking permissions...");
+        LocationPermission permission = await Geolocator.checkPermission().timeout(const Duration(seconds: 3));
+        LogService().log("Permission status: $permission");
+        
+        if (permission == LocationPermission.denied) {
+            LogService().log("Requesting permission...");
+            permission = await Geolocator.requestPermission().timeout(const Duration(seconds: 10)); // Time to click dialog
+        }
 
-      final GoogleMapController controller = await _controllerCompleter.future;
-      controller.animateCamera(CameraUpdate.newLatLng(
-        LatLng(position.latitude, position.longitude),
-      ));
+        if (permission == LocationPermission.deniedForever || permission == LocationPermission.denied) {
+            LogService().log("Permission denied.");
+            if (mounted) setState(() => _isLoading = false);
+            _createMarkers(); // Try showing default markers anyway
+            return;
+        }
+
+        // 3. Get Current Location
+        LogService().log("Getting location...");
+        Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high).timeout(const Duration(seconds: 5));
+        LogService().log("Got location: ${position.latitude}, ${position.longitude}");
+        
+        final currentLoc = LatLng(position.latitude, position.longitude);
+        _controllerCompleter.future.then((controller) {
+            controller.animateCamera(CameraUpdate.newLatLng(currentLoc));
+        });
+        
     } catch (e) {
-      print("Error getting location: $e");
-    }
-
-    if (mounted) {
-      setState(() {
-        _isLoading = false;
-      });
+        LogService().log("Location Error/Timeout: $e");
+    } finally {
+        if (mounted) {
+            setState(() => _isLoading = false);
+            _createMarkers();
+        }
     }
   }
 
-  void _createMarkers() {
+  void _createMarkers() async {
+    LogService().log("Starting _createMarkers");
     final markers = <Marker>{};
-    // Safe limit for simple markers
+    
+    LatLng center = _kGooglePlex.target;
+    try {
+        Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high).timeout(const Duration(seconds: 2));
+        center = LatLng(position.latitude, position.longitude);
+    } catch (e) {
+        // Ignore error, use default
+    }
+
+    LogService().log("Center: ${center.latitude}, ${center.longitude}");
+    LogService().log("Wifi List size: ${_wifiList.length}");
+
+    if (_wifiList.isEmpty) { 
+        LogService().log("Warning: Wifi List is Empty in _createMarkers");
+    } else {
+        // Sort by distance
+        _wifiList.sort((a, b) {
+            final double distA = Geolocator.distanceBetween(center.latitude, center.longitude, a.lat, a.lng);
+            final double distB = Geolocator.distanceBetween(center.latitude, center.longitude, b.lat, b.lng);
+            return distA.compareTo(distB);
+        });
+        LogService().log("Sorted Wifi List");
+    }
+
+    // Take top 500
     final limit = _wifiList.length > 500 ? 500 : _wifiList.length; 
     
     for (var i = 0; i < limit; i++) {
         final wifi = _wifiList[i];
         if (wifi.lat == 0 || wifi.lng == 0) continue;
+
+        if (i < 3) {
+             LogService().log("Adding Marker $i: ${wifi.installationPlace}");
+        }
 
         final marker = Marker(
             markerId: MarkerId(i.toString()),
@@ -86,6 +126,8 @@ class _MapScreenState extends State<MapScreen> {
         markers.add(marker);
     }
 
+    LogService().log("Final Marker Count: ${markers.length}");
+
     setState(() {
       _markers = markers;
     });
@@ -93,23 +135,32 @@ class _MapScreenState extends State<MapScreen> {
 
   @override
   Widget build(BuildContext context) {
-    if (_isLoading) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      );
-    }
-
     return Scaffold(
       appBar: AppBar(title: const Text('Public WiFi Radar')),
-      body: GoogleMap(
-        mapType: MapType.normal,
-        initialCameraPosition: _kGooglePlex,
-        myLocationEnabled: true,
-        myLocationButtonEnabled: true,
-        markers: _markers,
-        onMapCreated: (GoogleMapController controller) {
-          _controllerCompleter.complete(controller);
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+            LogService().log("Debug Refresh Pressed");
+            _createMarkers();
         },
+        child: const Icon(Icons.refresh),
+      ),
+      body: Stack(
+        children: [
+            GoogleMap(
+                mapType: MapType.normal,
+                initialCameraPosition: _kGooglePlex,
+                myLocationEnabled: true,
+                myLocationButtonEnabled: true,
+                markers: _markers,
+                onMapCreated: (GoogleMapController controller) {
+                _controllerCompleter.complete(controller);
+                },
+            ),
+            if (_isLoading)
+                const Center(
+                    child: CircularProgressIndicator(),
+                ),
+        ],
       ),
     );
   }
