@@ -10,28 +10,43 @@ import 'package:public_wifi_radar/services/log_service.dart';
 class CsvService {
   Future<List<WifiInfo>> loadWifiData() async {
     List<WifiInfo> allWifiList = [];
+    final totalStopwatch = Stopwatch()..start();
 
     try {
       // Load Seoul data
+      LogService().log('Starting Seoul WiFi data loading...');
+      final seoulStopwatch = Stopwatch()..start();
       final seoulData = await _loadSingleFile(
         'assets/csv/seoul_public_wifi_data.csv',
       );
+      seoulStopwatch.stop();
       allWifiList.addAll(seoulData);
-      LogService().log('Seoul WiFi data loaded: ${seoulData.length} items');
+      LogService().log(
+        'Seoul WiFi data loaded: ${seoulData.length} items in ${seoulStopwatch.elapsedMilliseconds}ms',
+      );
 
       // Load non-Seoul data (other regions)
+      LogService().log('Starting non-Seoul WiFi data loading...');
+      final otherStopwatch = Stopwatch()..start();
       final otherData = await _loadSingleFile(
         'assets/csv/public_wifi_data.csv',
       );
+      otherStopwatch.stop();
       allWifiList.addAll(otherData);
-      LogService().log('Non-Seoul WiFi data loaded: ${otherData.length} items');
-
       LogService().log(
-        'Total WiFi locations loaded: ${allWifiList.length} items',
+        'Non-Seoul WiFi data loaded: ${otherData.length} items in ${otherStopwatch.elapsedMilliseconds}ms',
+      );
+
+      totalStopwatch.stop();
+      LogService().log(
+        'Total WiFi locations loaded: ${allWifiList.length} items in ${totalStopwatch.elapsedMilliseconds}ms (${(totalStopwatch.elapsedMilliseconds / 1000).toStringAsFixed(2)}s)',
       );
       return allWifiList;
     } catch (e) {
-      LogService().log('Error loading WiFi data: $e');
+      totalStopwatch.stop();
+      LogService().log(
+        'Error loading WiFi data: $e (failed after ${totalStopwatch.elapsedMilliseconds}ms)',
+      );
       return [];
     }
   }
