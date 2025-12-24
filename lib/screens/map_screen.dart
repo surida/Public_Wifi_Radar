@@ -145,13 +145,6 @@ class _MapScreenState extends State<MapScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Public WiFi Radar')),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-            LogService().log("Debug Refresh Pressed");
-            _createMarkers();
-        },
-        child: const Icon(Icons.refresh),
-      ),
       body: Stack(
         children: [
             GoogleMap(
