@@ -18,6 +18,7 @@ class _MapScreenState extends State<MapScreen> {
   List<WifiInfo> _wifiList = [];
   Set<Marker> _markers = {};
   bool _isLoading = true;
+  Timer? _debounceTimer;
   
   // Default camera position (Seoul)
   static const CameraPosition _kGooglePlex = CameraPosition(
@@ -77,28 +78,35 @@ class _MapScreenState extends State<MapScreen> {
     }
   }
 
-  void _createMarkers() async {
+  void _createMarkers({LatLng? center}) async {
     LogService().log("Starting _createMarkers");
     final markers = <Marker>{};
     
-    LatLng center = _kGooglePlex.target;
-    try {
+    // Use provided center or get current location/default
+    LatLng centerPoint;
+    if (center != null) {
+      centerPoint = center;
+      LogService().log("Using provided center: ${center.latitude}, ${center.longitude}");
+    } else {
+      centerPoint = _kGooglePlex.target;
+      try {
         Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high).timeout(const Duration(seconds: 2));
-        center = LatLng(position.latitude, position.longitude);
-    } catch (e) {
+        centerPoint = LatLng(position.latitude, position.longitude);
+      } catch (e) {
         // Ignore error, use default
+      }
     }
 
-    LogService().log("Center: ${center.latitude}, ${center.longitude}");
+    LogService().log("Center: ${centerPoint.latitude}, ${centerPoint.longitude}");
     LogService().log("Wifi List size: ${_wifiList.length}");
 
     if (_wifiList.isEmpty) { 
         LogService().log("Warning: Wifi List is Empty in _createMarkers");
     } else {
-        // Sort by distance
+        // Sort by distance from center point
         _wifiList.sort((a, b) {
-            final double distA = Geolocator.distanceBetween(center.latitude, center.longitude, a.lat, a.lng);
-            final double distB = Geolocator.distanceBetween(center.latitude, center.longitude, b.lat, b.lng);
+            final double distA = Geolocator.distanceBetween(centerPoint.latitude, centerPoint.longitude, a.lat, a.lng);
+            final double distB = Geolocator.distanceBetween(centerPoint.latitude, centerPoint.longitude, b.lat, b.lng);
             return distA.compareTo(distB);
         });
         LogService().log("Sorted Wifi List");
@@ -116,7 +124,7 @@ class _MapScreenState extends State<MapScreen> {
         }
 
         final marker = Marker(
-            markerId: MarkerId(i.toString()),
+            markerId: MarkerId('${wifi.lat}_${wifi.lng}'),
             position: LatLng(wifi.lat, wifi.lng),
             infoWindow: InfoWindow(
               title: wifi.installationPlace,
@@ -153,7 +161,22 @@ class _MapScreenState extends State<MapScreen> {
                 myLocationButtonEnabled: true,
                 markers: _markers,
                 onMapCreated: (GoogleMapController controller) {
-                _controllerCompleter.complete(controller);
+                  _controllerCompleter.complete(controller);
+                },
+                onCameraIdle: () async {
+                  // Debounce: Wait 300ms after camera stops moving
+                  _debounceTimer?.cancel();
+                  _debounceTimer = Timer(const Duration(milliseconds: 300), () async {
+                    // When camera stops moving, update markers based on new center
+                    final controller = await _controllerCompleter.future;
+                    final cameraPosition = await controller.getVisibleRegion();
+                    final center = LatLng(
+                      (cameraPosition.northeast.latitude + cameraPosition.southwest.latitude) / 2,
+                      (cameraPosition.northeast.longitude + cameraPosition.southwest.longitude) / 2,
+                    );
+                    LogService().log("Camera idle, updating markers for center: ${center.latitude}, ${center.longitude}");
+                    _createMarkers(center: center);
+                  });
                 },
             ),
             if (_isLoading)
