@@ -26,9 +26,11 @@ import FirebaseCore
       print("[AppDelegate ERROR] Failed to initialize Google Maps: \(error)")
     }
     
+    let result = super.application(application, didFinishLaunchingWithOptions: launchOptions)
+    
     GeneratedPluginRegistrant.register(with: self)
     print("[AppDelegate] Plugin registration complete")
     
-    return super.application(application, didFinishLaunchingWithOptions: launchOptions)
+    return result
   }
 }
