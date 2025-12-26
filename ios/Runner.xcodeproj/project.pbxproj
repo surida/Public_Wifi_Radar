@@ -363,7 +363,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/FirebaseCrashlytics/upload-symbols\" --build-phase -ai 1:788815273414:ios:51c3512bcf5f9444ede6c7 -- \"${DWARF_DSYM_FOLDER_PATH}/App.framework.dSYM\" || true\n";
+			shellScript = "if [ \"${CONFIGURATION}\" = \"Debug\" ]; then exit 0; fi\n\"${PODS_ROOT}/FirebaseCrashlytics/upload-symbols\" --build-phase -ai 1:788815273414:ios:51c3512bcf5f9444ede6c7 -- \"${DWARF_DSYM_FOLDER_PATH}/App.framework.dSYM\" || true\n";
 		};
 		9F393C9ACF8390D122E776FE /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;

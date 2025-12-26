@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart'; // Import for kDebugMode
+
 import 'dart:typed_data';
 import 'package:csv/csv.dart';
 import 'package:flutter/services.dart' show rootBundle;
@@ -31,7 +33,15 @@ class CsvService {
         'assets/csv/public_wifi_data.csv',
       );
       otherStopwatch.stop();
-      allWifiList.addAll(otherData);
+      if (!kDebugMode) {
+        // Only load other regions data fully in Release mode or if controlled
+        allWifiList.addAll(otherData);
+      } else {
+        // In debug, maybe skip or add limited amount?
+        // Let's implement limiting inside _loadSingleFile based on kDebugMode
+        allWifiList.addAll(otherData);
+      }
+
       LogService().log(
         'Non-Seoul WiFi data loaded: ${otherData.length} items in ${otherStopwatch.elapsedMilliseconds}ms',
       );
@@ -65,8 +75,19 @@ class CsvService {
       ).convert(decodedData);
 
       List<WifiInfo> wifiList = [];
+
+      // DETERMINE LIMIT: 120,000 items is too much for Debug mode (OOM).
+      // Limit to 2,000 items per file in Debug mode.
+      int loadCount = rows.length;
+      if (kDebugMode) {
+        loadCount = rows.length > 2000 ? 2000 : rows.length;
+        LogService().log(
+          '[DEBUG MODE] Limiting $assetPath loading to $loadCount items to prevent OOM.',
+        );
+      }
+
       // Skip header (index 0) and load all WiFi locations
-      for (var i = 1; i < rows.length; i++) {
+      for (var i = 1; i < loadCount; i++) {
         if (i == 1) {
           LogService().log('[$assetPath] Row 1: ${rows[i]}');
           LogService().log('[$assetPath] Row 1 length: ${rows[i].length}');
