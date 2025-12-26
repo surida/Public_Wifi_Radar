@@ -8,8 +8,21 @@ import GoogleMaps
     _ application: UIApplication,
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
   ) -> Bool {
-    GMSServices.provideAPIKey("AIzaSyA0D0dfua7LuH18-OZL-4OI5lLj7XP6bqg")
+    // Log app delegate initialization
+    print("[AppDelegate] didFinishLaunchingWithOptions called")
+    
+    // Initialize Google Maps with error handling
+    do {
+      print("[AppDelegate] Initializing Google Maps...")
+      GMSServices.provideAPIKey("AIzaSyA0D0dfua7LuH18-OZL-4OI5lLj7XP6bqg")
+      print("[AppDelegate] Google Maps API key provided successfully")
+    } catch {
+      print("[AppDelegate ERROR] Failed to initialize Google Maps: \(error)")
+    }
+    
     GeneratedPluginRegistrant.register(with: self)
+    print("[AppDelegate] Plugin registration complete")
+    
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
   }
 }
