@@ -1,6 +1,7 @@
 import Flutter
 import UIKit
 import GoogleMaps
+import FirebaseCore
 
 @main
 @objc class AppDelegate: FlutterAppDelegate {
@@ -10,6 +11,11 @@ import GoogleMaps
   ) -> Bool {
     // Log app delegate initialization
     print("[AppDelegate] didFinishLaunchingWithOptions called")
+    
+    // Initialize Firebase
+    print("[AppDelegate] Initializing Firebase...")
+    FirebaseApp.configure()
+    print("[AppDelegate] Firebase initialized successfully")
     
     // Initialize Google Maps with error handling
     do {
