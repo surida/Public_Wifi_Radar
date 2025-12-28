@@ -1,6 +1,4 @@
-import 'package:flutter/foundation.dart'; // Import for kDebugMode
-
-import 'dart:typed_data';
+import 'package:flutter/foundation.dart';
 import 'package:csv/csv.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:cp949_codec/cp949_codec.dart';
@@ -9,6 +7,10 @@ import 'package:public_wifi_radar/models/wifi_info.dart';
 import 'package:public_wifi_radar/services/log_service.dart';
 
 class CsvService {
+  // 샘플링 비율: N개 중 1개만 로딩 (1 = 100%, 2 = 50%, 3 = 33%, 10 = 10%)
+  // Debug 모드에서만 적용, Release는 항상 100%
+  static const int sampleRate = 3; // 30% (3개 중 1개)
+
   Future<List<WifiInfo>> loadWifiData() async {
     List<WifiInfo> allWifiList = [];
     final totalStopwatch = Stopwatch()..start();
@@ -76,21 +78,26 @@ class CsvService {
 
       List<WifiInfo> wifiList = [];
 
-      // DETERMINE LIMIT: 120,000 items is too much for Debug mode (OOM).
-      // Limit to 2,000 items per file in Debug mode.
-      int loadCount = rows.length;
-      if (kDebugMode) {
-        loadCount = rows.length > 2000 ? 2000 : rows.length;
+      // Debug 모드: 샘플링 적용 (sampleRate개 중 1개만 로딩)
+      // Release 모드: 전체 로딩
+      final int effectiveSampleRate = kDebugMode ? sampleRate : 1;
+      final int totalRows = rows.length - 1; // 헤더 제외
+      final int expectedCount = (totalRows / effectiveSampleRate).ceil();
+
+      if (kDebugMode && sampleRate > 1) {
         LogService().log(
-          '[DEBUG MODE] Limiting $assetPath loading to $loadCount items to prevent OOM.',
+          '[DEBUG MODE] Sampling $assetPath: 1/$sampleRate (${(100 / sampleRate).toStringAsFixed(1)}%) = ~$expectedCount items from $totalRows total',
         );
       }
 
-      // Skip header (index 0) and load all WiFi locations
-      for (var i = 1; i < loadCount; i++) {
-        if (i == 1) {
-          LogService().log('[$assetPath] Row 1: ${rows[i]}');
-          LogService().log('[$assetPath] Row 1 length: ${rows[i].length}');
+      // Skip header (index 0) and load WiFi locations with sampling
+      for (var i = 1; i < rows.length; i++) {
+        // 샘플링: effectiveSampleRate개 중 첫 번째만 로딩
+        if ((i - 1) % effectiveSampleRate != 0) continue;
+
+        if (wifiList.isEmpty) {
+          LogService().log('[$assetPath] Row $i: ${rows[i]}');
+          LogService().log('[$assetPath] Row $i length: ${rows[i].length}');
           if (rows[i].length > 14) {
             LogService().log(
               '[$assetPath] Lat Raw: "${rows[i][13]}", Lng Raw: "${rows[i][14]}"',
