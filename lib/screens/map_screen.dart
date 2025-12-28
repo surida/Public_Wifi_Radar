@@ -23,19 +23,31 @@ class _MapScreenState extends State<MapScreen> {
   final Map<String, WifiInfo> _markerIdToWifi = {};
 
   bool _isLoading = true;
-  double _currentZoom = 14.4746;
+  double _currentZoom = 16.0;
   bool _showDebugOverlay = true;
   Timer? _debounceTimer;
 
   // Default camera position (Seoul)
   static const CameraPosition _kGooglePlex = CameraPosition(
     target: LatLng(37.5665, 126.9780),
-    zoom: 14.4746,
+    zoom: 16.0,
   );
+
+  // 줌 레벨 제한
+  static const double _minZoomLevel = 10.0; // 최소 줌 (시/도 단위)
+  static const double _maxZoomLevel = 20.0; // 최대 줌 (건물 단위)
 
   static const ClusterManagerId _clusterManagerId = ClusterManagerId(
     'wifi_cluster',
   );
+
+  /// 줌 레벨에 따른 마커 최대 개수 반환
+  int _getMarkerCountForZoom(double zoom) {
+    if (zoom <= 10) return 200; // 시/도 단위
+    if (zoom <= 12) return 500; // 구/군 단위
+    if (zoom <= 14) return 1000; // 동네 단위
+    return 2000; // 상세 보기
+  }
 
   @override
   void initState() {
@@ -146,8 +158,9 @@ class _MapScreenState extends State<MapScreen> {
       });
     }
 
-    // 상위 2000개만 사용
-    final count = _wifiList.length > 2000 ? 2000 : _wifiList.length;
+    // 줌 레벨에 따른 마커 개수 조절
+    final maxCount = _getMarkerCountForZoom(_currentZoom);
+    final count = _wifiList.length > maxCount ? maxCount : _wifiList.length;
     for (var i = 0; i < count; i++) {
       final wifi = _wifiList[i];
       final markerId = MarkerId(
@@ -202,6 +215,8 @@ class _MapScreenState extends State<MapScreen> {
           GoogleMap(
             mapType: MapType.normal,
             initialCameraPosition: _kGooglePlex,
+            minMaxZoomPreference:
+                const MinMaxZoomPreference(_minZoomLevel, _maxZoomLevel),
             myLocationEnabled: true,
             myLocationButtonEnabled: true,
             markers: _markers,
@@ -256,7 +271,7 @@ class _MapScreenState extends State<MapScreen> {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      '📍 Markers: ${_markers.length}',
+                      '📍 Markers: ${_markers.length}/${_getMarkerCountForZoom(_currentZoom)}',
                       style: const TextStyle(color: Colors.white, fontSize: 12),
                     ),
                   ],

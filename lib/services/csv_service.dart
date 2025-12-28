@@ -9,7 +9,7 @@ import 'package:public_wifi_radar/services/log_service.dart';
 class CsvService {
   // 샘플링 비율: N개 중 1개만 로딩 (1 = 100%, 2 = 50%, 3 = 33%, 10 = 10%)
   // Debug 모드에서만 적용, Release는 항상 100%
-  static const int sampleRate = 3; // 30% (3개 중 1개)
+  static const int sampleRate = 1; // 100% (전체 로딩)
 
   Future<List<WifiInfo>> loadWifiData() async {
     List<WifiInfo> allWifiList = [];
