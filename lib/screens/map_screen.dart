@@ -2,6 +2,8 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:public_wifi_radar/l10n/app_localizations.dart';
+import 'package:korean_romanization_converter/korean_romanization_converter.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:public_wifi_radar/models/wifi_info.dart';
@@ -134,6 +136,13 @@ class _MapScreenState extends State<MapScreen> {
     }
   }
 
+  String _getLocalizedText(String text) {
+    if (Localizations.localeOf(context).languageCode == 'en') {
+      return KoreanRomanizationConverter().romanize(text);
+    }
+    return text;
+  }
+
   void _createMarkers({LatLng? center}) {
     if (_wifiList.isEmpty) return;
 
@@ -175,8 +184,8 @@ class _MapScreenState extends State<MapScreen> {
         clusterManagerId: _clusterManagerId,
         position: LatLng(wifi.lat, wifi.lng),
         infoWindow: InfoWindow(
-          title: wifi.installationPlace,
-          snippet: wifi.detailedAddress,
+          title: _getLocalizedText(wifi.installationPlace),
+          snippet: _getLocalizedText(wifi.detailedAddress),
         ),
       );
       markers.add(marker);
@@ -198,9 +207,9 @@ class _MapScreenState extends State<MapScreen> {
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
-        title: const Text(
-          'Public WiFi Radar',
-          style: TextStyle(
+        title: Text(
+          AppLocalizations.of(context)!.appTitle,
+          style: const TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.w600,
             shadows: [Shadow(color: Colors.black26, blurRadius: 2)],
@@ -214,8 +223,8 @@ class _MapScreenState extends State<MapScreen> {
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
               colors: [
-                Colors.blue.shade700.withValues(alpha: 0.9),
-                Colors.blue.shade500.withValues(alpha: 0.6),
+                Colors.blue.shade700.withOpacity(0.9),
+                Colors.blue.shade500.withOpacity(0.6),
                 Colors.transparent,
               ],
             ),
@@ -289,7 +298,7 @@ class _MapScreenState extends State<MapScreen> {
               child: Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Colors.black.withValues(alpha: 0.7),
+                  color: Colors.black.withOpacity(0.7),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Column(
@@ -320,26 +329,27 @@ class _MapScreenState extends State<MapScreen> {
   }
 
   void _showInfoDialog() {
+    final l10n = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text('App Info'),
+          title: Text(l10n.infoTitle),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: const [
-              Text('📡 Data Source: Public Data Portal (data.go.kr)'),
-              SizedBox(height: 8),
-              Text('📲 Version: 1.0.0'),
-              SizedBox(height: 8),
-              Text('📧 Contact: contact@publicwifiradar.com'),
+            children: [
+              Text('📡 ${l10n.dataSource}'),
+              const SizedBox(height: 8),
+              Text('📲 ${l10n.appVersion}: 1.0.0'),
+              const SizedBox(height: 8),
+              Text('📧 ${l10n.contact}: contact@publicwifiradar.com'),
             ],
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Close'),
+              child: Text(l10n.close),
             ),
           ],
         );

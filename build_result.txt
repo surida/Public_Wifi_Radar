@@ -1,0 +1,193 @@
+Building com.gsahn.publicWifiRadar for device (ios-release)...
+Automatically signing iOS for device deployment using specified development team in Xcode project: YGJH9LSYSM
+Running pod install...                                              9.1s
+Running Xcode build...                                          
+Xcode build done.                                           65.0s
+Failed to build iOS app
+Error output from Xcode build:
+↳
+    ** BUILD FAILED **
+
+
+Xcode's output:
+↳
+    Writing result bundle at path:
+    	/var/folders/4y/n87vjq455xzgj3z0t4d8tg080000gn/T/flutter_tools.LTnAXv/flutter_ios_build_temp_dirmKeGxR/temporary_xcresult_bundle
+
+    /Users/kwansooahn/.pub-cache/hosted/pub.dev/url_launcher_ios-6.3.6/ios/url_launcher_ios/Sources/url_launcher_ios/URLLauncherPlugin.swift:22:26: warning: 'keyWindow' was deprecated in iOS 13.0: Should not be used for applications that support multiple scenes as it returns a key window across all connected scenes
+        UIApplication.shared.keyWindow?.rootViewController?.topViewController
+                             ^
+    /Users/kwansooahn/.pub-cache/hosted/pub.dev/permission_handler_apple-9.4.7/ios/Classes/strategies/PhonePermissionStrategy.m:49:35: warning: 'subscriberCellularProvider' is deprecated: first deprecated in iOS 12.0 [-Wdeprecated-declarations]
+       49 |     CTCarrier *carrier = [netInfo subscriberCellularProvider];
+          |                                   ^~~~~~~~~~~~~~~~~~~~~~~~~~
+          |                                   serviceSubscriberCellularProviders
+    In module 'CoreTelephony' imported from /Users/kwansooahn/.pub-cache/hosted/pub.dev/permission_handler_apple-9.4.7/ios/Classes/strategies/PhonePermissionStrategy.m:8:
+    /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/System/Library/Frameworks/CoreTelephony.framework/Headers/CTTelephonyNetworkInfo.h:114:50: note: property 'subscriberCellularProvider' is declared deprecated here
+      114 | @property(readonly, retain, nullable) CTCarrier *subscriberCellularProvider API_DEPRECATED_WITH_REPLACEMENT("serviceSubscriberCellularProviders", ios(4.0, 12.0)) API_UNAVAILABLE(macos);
+          |                                                  ^
+    /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/System/Library/Frameworks/CoreTelephony.framework/Headers/CTTelephonyNetworkInfo.h:114:50: note: 'subscriberCellularProvider' has been explicitly marked deprecated here
+    1 warning generated.
+    /Users/kwansooahn/.pub-cache/hosted/pub.dev/geolocator_apple-2.3.13/darwin/geolocator_apple/Sources/geolocator_apple/Handlers/PermissionHandler.m:40:31: warning: 'authorizationStatus' is deprecated: first deprecated in iOS 14.0 [-Wdeprecated-declarations]
+       40 |     return [CLLocationManager authorizationStatus];
+          |                               ^~~~~~~~~~~~~~~~~~~
+          |                               authorizationStatus
+    In module 'CoreLocation' imported from /Users/kwansooahn/.pub-cache/hosted/pub.dev/geolocator_apple-2.3.13/darwin/geolocator_apple/Sources/geolocator_apple/Handlers/../include/geolocator_apple/Handlers/PermissionHandler.h:11:
+    /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.4.sdk/System/Library/Frameworks/CoreLocation.framework/Headers/CLLocationManager.h:231:1: note: 'authorizationStatus' has been explicitly marked deprecated here
+      231 | + (CLAuthorizationStatus)authorizationStatus API_DEPRECATED_WITH_REPLACEMENT("-authorizationStatus", ios(4.2, 14.0), macos(10.7, 11.0), watchos(1.0, 7.0), tvos(9.0, 14.0));
+          | ^
+    /Users/kwansooahn/.pub-cache/hosted/pub.dev/geolocator_apple-2.3.13/darwin/geolocator_apple/Sources/geolocator_apple/Handlers/PermissionHandler.m:47:65: warning: 'authorizationStatus' is deprecated: first deprecated in iOS 14.0 [-Wdeprecated-declarations]
+       47 |   CLAuthorizationStatus authorizationStatus = CLLocationManager.authorizationStatus;
+          |                                                                 ^~~~~~~~~~~~~~~~~~~
+          |                                                                 authorizationStatus
+    In module 'CoreLocation' imported from /Users/kwansooahn/.pub-cache/hosted/pub.dev/geolocator_apple-2.3.13/darwin/geolocator_apple/Sources/geolocator_apple/Handlers/../include/geolocator_apple/Handlers/PermissionHandler.h:11:
+    /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.4.sdk/System/Library/Frameworks/CoreLocation.framework/Headers/CLLocationManager.h:231:1: note: 'authorizationStatus' has been explicitly marked deprecated here
+      231 | + (CLAuthorizationStatus)authorizationStatus API_DEPRECATED_WITH_REPLACEMENT("-authorizationStatus", ios(4.2, 14.0), macos(10.7, 11.0), watchos(1.0, 7.0), tvos(9.0, 14.0));
+          | ^
+    /Users/kwansooahn/.pub-cache/hosted/pub.dev/geolocator_apple-2.3.13/darwin/geolocator_apple/Sources/geolocator_apple/Handlers/PermissionHandler.m:47:65: warning: 'authorizationStatus' is deprecated: first deprecated in iOS 14.0 [-Wdeprecated-declarations]
+       47 |   CLAuthorizationStatus authorizationStatus = CLLocationManager.authorizationStatus;
+          |                                                                 ^~~~~~~~~~~~~~~~~~~
+          |                                                                 authorizationStatus
+    In module 'CoreLocation' imported from /Users/kwansooahn/.pub-cache/hosted/pub.dev/geolocator_apple-2.3.13/darwin/geolocator_apple/Sources/geolocator_apple/Handlers/../include/geolocator_apple/Handlers/PermissionHandler.h:11:
+    /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.4.sdk/System/Library/Frameworks/CoreLocation.framework/Headers/CLLocationManager.h:231:1: note: 'authorizationStatus' has been explicitly marked deprecated here
+      231 | + (CLAuthorizationStatus)authorizationStatus API_DEPRECATED_WITH_REPLACEMENT("-authorizationStatus", ios(4.2, 14.0), macos(10.7, 11.0), watchos(1.0, 7.0), tvos(9.0, 14.0));
+          | ^
+    /Users/kwansooahn/.pub-cache/hosted/pub.dev/geolocator_apple-2.3.13/darwin/geolocator_apple/Sources/geolocator_apple/Handlers/PermissionHandler.m:107:1: warning: implementing deprecated method [-Wdeprecated-implementations]
+      107 | - (void) locationManager:(CLLocationManager *)manager didChangeAuthorizationStatus:(CLAuthorizationStatus)status {
+          | ^
+    In module 'CoreLocation' imported from /Users/kwansooahn/.pub-cache/hosted/pub.dev/geolocator_apple-2.3.13/darwin/geolocator_apple/Sources/geolocator_apple/Handlers/../include/geolocator_apple/Handlers/PermissionHandler.h:11:
+    /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.4.sdk/System/Library/Frameworks/CoreLocation.framework/Headers/CLLocationManagerDelegate.h:208:1: note: method 'locationManager:didChangeAuthorizationStatus:' declared here
+      208 | - (void)locationManager:(CLLocationManager *)manager didChangeAuthorizationStatus:(CLAuthorizationStatus)status API_DEPRECATED_WITH_REPLACEMENT("-locationManagerDidChangeAuthorization:", ios(4.2, 14.0), macos(10.7, 11.0), watchos(1.0, 7.0), tvos(9.0, 14.0));
+          | ^
+    4 warnings generated.
+    /Users/kwansooahn/.pub-cache/hosted/pub.dev/geolocator_apple-2.3.13/darwin/geolocator_apple/Sources/geolocator_apple/Handlers/LocationServiceStreamHandler.m:36:1: warning: implementing deprecated method [-Wdeprecated-implementations]
+       36 | - (void)locationManager:(CLLocationManager *)manager didChangeAuthorizationStatus:(CLAuthorizationStatus)status{
+          | ^
+    In module 'CoreLocation' imported from /Users/kwansooahn/.pub-cache/hosted/pub.dev/geolocator_apple-2.3.13/darwin/geolocator_apple/Sources/geolocator_apple/Handlers/LocationServiceStreamHandler.m:9:
+    /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.4.sdk/System/Library/Frameworks/CoreLocation.framework/Headers/CLLocationManagerDelegate.h:208:1: note: method 'locationManager:didChangeAuthorizationStatus:' declared here
+      208 | - (void)locationManager:(CLLocationManager *)manager didChangeAuthorizationStatus:(CLAuthorizationStatus)status API_DEPRECATED_WITH_REPLACEMENT("-locationManagerDidChangeAuthorization:", ios(4.2, 14.0), macos(10.7, 11.0), watchos(1.0, 7.0), tvos(9.0, 14.0));
+          | ^
+    1 warning generated.
+    ld: warning: ignoring duplicate libraries: '-lc++'
+    /Users/kwansooahn/.pub-cache/hosted/pub.dev/firebase_core-3.15.2/ios/firebase_core/Sources/firebase_core/FLTFirebaseCorePlugin.m:92:49: warning: 'deepLinkURLScheme' is deprecated [-Wdeprecated-declarations]
+       92 |   pigeonOptions.deepLinkURLScheme = (id)options.deepLinkURLScheme ?: [NSNull null];
+          |                                                 ^
+    In module 'FirebaseCore' imported from /Users/kwansooahn/.pub-cache/hosted/pub.dev/firebase_core-3.15.2/ios/firebase_core/Sources/firebase_core/include/firebase_core/FLTFirebasePlugin.h:10:
+    /Users/kwansooahn/WorkSpace/PublicWifiRadar/public_wifi_radar 2/ios/Pods/FirebaseCore/FirebaseCore/Sources/Public/FirebaseCore/FIROptions.h:86:66: note: 'deepLinkURLScheme' has been explicitly marked deprecated here
+       86 | @property(nonatomic, copy, nullable) NSString *deepLinkURLScheme DEPRECATED_ATTRIBUTE;
+          |                                                                  ^
+    In module 'Foundation' imported from /Users/kwansooahn/.pub-cache/hosted/pub.dev/firebase_core-3.15.2/ios/firebase_core/Sources/firebase_core/include/firebase_core/FLTFirebasePlugin.h:11:
+    In module 'CoreFoundation' imported from /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/System/Library/Frameworks/Foundation.framework/Headers/Foundation.h:6:
+    In module 'AvailabilityMacros' imported from /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.4.sdk/System/Library/Frameworks/CoreFoundation.framework/Headers/CFAvailability.h:23:
+    /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/AvailabilityMacros.h:150:60: note: expanded from macro 'DEPRECATED_ATTRIBUTE'
+      150 |         #define DEPRECATED_ATTRIBUTE        __attribute__((deprecated))
+          |                                                            ^
+    /Users/kwansooahn/.pub-cache/hosted/pub.dev/firebase_core-3.15.2/ios/firebase_core/Sources/firebase_core/FLTFirebaseCorePlugin.m:168:13: warning: 'deepLinkURLScheme' is deprecated [-Wdeprecated-declarations]
+      168 |     options.deepLinkURLScheme = initializeAppRequest.deepLinkURLScheme;
+          |             ^
+    In module 'FirebaseCore' imported from /Users/kwansooahn/.pub-cache/hosted/pub.dev/firebase_core-3.15.2/ios/firebase_core/Sources/firebase_core/include/firebase_core/FLTFirebasePlugin.h:10:
+    /Users/kwansooahn/WorkSpace/PublicWifiRadar/public_wifi_radar 2/ios/Pods/FirebaseCore/FirebaseCore/Sources/Public/FirebaseCore/FIROptions.h:86:66: note: 'deepLinkURLScheme' has been explicitly marked deprecated here
+       86 | @property(nonatomic, copy, nullable) NSString *deepLinkURLScheme DEPRECATED_ATTRIBUTE;
+          |                                                                  ^
+    In module 'Foundation' imported from /Users/kwansooahn/.pub-cache/hosted/pub.dev/firebase_core-3.15.2/ios/firebase_core/Sources/firebase_core/include/firebase_core/FLTFirebasePlugin.h:11:
+    In module 'CoreFoundation' imported from /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/System/Library/Frameworks/Foundation.framework/Headers/Foundation.h:6:
+    In module 'AvailabilityMacros' imported from /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.4.sdk/System/Library/Frameworks/CoreFoundation.framework/Headers/CFAvailability.h:23:
+    /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include/AvailabilityMacros.h:150:60: note: expanded from macro 'DEPRECATED_ATTRIBUTE'
+      150 |         #define DEPRECATED_ATTRIBUTE        __attribute__((deprecated))
+          |                                                            ^
+    /Users/kwansooahn/.pub-cache/hosted/pub.dev/firebase_core-3.15.2/ios/firebase_core/Sources/firebase_core/FLTFirebaseCorePlugin.m:255:74: warning: conflicting parameter types in implementation of 'setAutomaticResourceManagementEnabledAppName:enabled:completion:': 'BOOL' (aka '_Bool') vs 'NSNumber * _Nonnull __strong' [-Wmismatched-parameter-types]
+      255 |                                              enabled:(nonnull NSNumber *)enabled
+          |                                                                          ^
+    In file included from /Users/kwansooahn/.pub-cache/hosted/pub.dev/firebase_core-3.15.2/ios/firebase_core/Sources/firebase_core/FLTFirebaseCorePlugin.m:6:
+    In file included from /Users/kwansooahn/.pub-cache/hosted/pub.dev/firebase_core-3.15.2/ios/firebase_core/Sources/firebase_core/include/firebase_core/FLTFirebaseCorePlugin.h:16:
+    /Users/kwansooahn/.pub-cache/hosted/pub.dev/firebase_core-3.15.2/ios/firebase_core/Sources/firebase_core/include/firebase_core/messages.g.h:91:60: note: previous definition is here
+       91 |                                              enabled:(BOOL)enabled
+          |                                                       ~~~~ ^
+    3 warnings generated.
+    ../../../.pub-cache/hosted/pub.dev/google_maps_cluster_manager-3.0.0/lib/src/cluster_manager.dart:8:1: Error: 'Cluster' is imported from both 'package:google_maps_cluster_manager/src/cluster.dart' and 'package:google_maps_flutter_platform_interface/src/types/cluster.dart'.
+    import 'package:google_maps_flutter_platform_interface/google_maps_flutter_platform_interface.dart';
+    ^^^^^^^
+    ../../../.pub-cache/hosted/pub.dev/google_maps_cluster_manager-3.0.0/lib/src/cluster_manager.dart:104:38: Error: 'Cluster' is imported from both 'package:google_maps_cluster_manager/src/cluster.dart' and 'package:google_maps_flutter_platform_interface/src/types/cluster.dart'.
+          return visibleItems.map((i) => Cluster<T>([i])).toList();
+                                         ^^^^^^^
+    ../../../.pub-cache/hosted/pub.dev/google_maps_cluster_manager-3.0.0/lib/src/cluster_manager.dart:164:21: Error: 'Cluster' is imported from both 'package:google_maps_cluster_manager/src/cluster.dart' and 'package:google_maps_flutter_platform_interface/src/types/cluster.dart'.
+        markerItems.add(Cluster<T>(items));
+                        ^^^^^^^
+    ../../../.pub-cache/hosted/pub.dev/google_maps_cluster_manager-3.0.0/lib/src/cluster_manager.dart:175:38: Error: The method 'getId' isn't defined for the type 'Object?'.
+     - 'Object' is from 'dart:core'.
+    Try correcting the name to the name of an existing method, or defining a method named 'getId'.
+              markerId: MarkerId(cluster.getId()),
+                                         ^^^^^
+    ../../../.pub-cache/hosted/pub.dev/google_maps_cluster_manager-3.0.0/lib/src/cluster_manager.dart:176:29: Error: The getter 'location' isn't defined for the type 'Object?'.
+     - 'Object' is from 'dart:core'.
+    Try correcting the name to the name of an existing getter, or defining a getter or field named 'location'.
+              position: cluster.location,
+                                ^^^^^^^^
+    ../../../.pub-cache/hosted/pub.dev/google_maps_cluster_manager-3.0.0/lib/src/cluster_manager.dart:180:54: Error: The getter 'isMultiple' isn't defined for the type 'Object?'.
+     - 'Object' is from 'dart:core'.
+    Try correcting the name to the name of an existing getter, or defining a getter or field named 'isMultiple'.
+              icon: await _getBasicClusterBitmap(cluster.isMultiple ? 125 : 75,
+                                                         ^^^^^^^^^^
+    ../../../.pub-cache/hosted/pub.dev/google_maps_cluster_manager-3.0.0/lib/src/cluster_manager.dart:181:29: Error: The getter 'isMultiple' isn't defined for the type 'Object?'.
+     - 'Object' is from 'dart:core'.
+    Try correcting the name to the name of an existing getter, or defining a getter or field named 'isMultiple'.
+                  text: cluster.isMultiple ? cluster.count.toString() : null),
+                                ^^^^^^^^^^
+    ../../../.pub-cache/hosted/pub.dev/google_maps_cluster_manager-3.0.0/lib/src/cluster_manager.dart:181:50: Error: The getter 'count' isn't defined for the type 'Object?'.
+     - 'Object' is from 'dart:core'.
+    Try correcting the name to the name of an existing getter, or defining a getter or field named 'count'.
+                  text: cluster.isMultiple ? cluster.count.toString() : null),
+                                                     ^^^^^
+    ../../../.pub-cache/hosted/pub.dev/google_maps_cluster_manager-3.0.0/lib/src/cluster_item.dart:9:44: Error: 'ClusterManager' is imported from both 'package:google_maps_cluster_manager/src/cluster_manager.dart' and 'package:google_maps_flutter_platform_interface/src/types/cluster_manager.dart'.
+          Geohash.encode(location, codeLength: ClusterManager.precision);
+                                               ^^^^^^^^^^^^^^
+    Target kernel_snapshot_program failed: Exception
+    Failed to package /Users/kwansooahn/WorkSpace/PublicWifiRadar/public_wifi_radar 2.
+    Command PhaseScriptExecution failed with a nonzero exit code
+    note: Disabling previews because SWIFT_VERSION is set and SWIFT_OPTIMIZATION_LEVEL=-O, expected -Onone (in target 'GoogleMaps' from project 'Pods')
+    note: Disabling previews because SWIFT_VERSION is set and SWIFT_OPTIMIZATION_LEVEL=-O, expected -Onone (in target 'permission_handler_apple-permission_handler_apple_privacy' from project 'Pods')
+    note: Disabling previews because SWIFT_VERSION is set and SWIFT_OPTIMIZATION_LEVEL=-O, expected -Onone (in target 'url_launcher_ios-url_launcher_ios_privacy' from project 'Pods')
+    note: Disabling previews because SWIFT_VERSION is set and SWIFT_OPTIMIZATION_LEVEL=-O, expected -Onone (in target 'url_launcher_ios' from project 'Pods')
+    note: Disabling previews because SWIFT_VERSION is set and SWIFT_OPTIMIZATION_LEVEL=-O, expected -Onone (in target 'permission_handler_apple' from project 'Pods')
+    note: Disabling previews because SWIFT_VERSION is set and SWIFT_OPTIMIZATION_LEVEL=-O, expected -Onone (in target 'path_provider_foundation-path_provider_foundation_privacy' from project 'Pods')
+    note: Disabling previews because SWIFT_VERSION is set and SWIFT_OPTIMIZATION_LEVEL=-O, expected -Onone (in target 'path_provider_foundation' from project 'Pods')
+    note: Disabling previews because SWIFT_VERSION is set and SWIFT_OPTIMIZATION_LEVEL=-O, expected -Onone (in target 'package_info_plus-package_info_plus_privacy' from project 'Pods')
+    note: Disabling previews because SWIFT_VERSION is set and SWIFT_OPTIMIZATION_LEVEL=-O, expected -Onone (in target 'package_info_plus' from project 'Pods')
+    note: Disabling previews because SWIFT_VERSION is set and SWIFT_OPTIMIZATION_LEVEL=-O, expected -Onone (in target 'nanopb-nanopb_Privacy' from project 'Pods')
+    note: Disabling previews because SWIFT_VERSION is set and SWIFT_OPTIMIZATION_LEVEL=-O, expected -Onone (in target 'nanopb' from project 'Pods')
+    note: Disabling previews because SWIFT_VERSION is set and SWIFT_OPTIMIZATION_LEVEL=-O, expected -Onone (in target 'google_maps_flutter_ios-google_maps_flutter_ios_privacy' from project 'Pods')
+    note: Disabling previews because SWIFT_VERSION is set and SWIFT_OPTIMIZATION_LEVEL=-O, expected -Onone (in target 'google_maps_flutter_ios' from project 'Pods')
+    note: Disabling previews because SWIFT_VERSION is set and SWIFT_OPTIMIZATION_LEVEL=-O, expected -Onone (in target 'geolocator_apple-geolocator_apple_privacy' from project 'Pods')
+    note: Disabling previews because SWIFT_VERSION is set and SWIFT_OPTIMIZATION_LEVEL=-O, expected -Onone (in target 'geolocator_apple' from project 'Pods')
+    note: Disabling previews because SWIFT_VERSION is set and SWIFT_OPTIMIZATION_LEVEL=-O, expected -Onone (in target 'firebase_crashlytics' from project 'Pods')
+    note: Disabling previews because SWIFT_VERSION is set and SWIFT_OPTIMIZATION_LEVEL=-O, expected -Onone (in target 'firebase_core' from project 'Pods')
+    note: Disabling previews because SWIFT_VERSION is set and SWIFT_OPTIMIZATION_LEVEL=-O, expected -Onone (in target 'Runner' from project 'Runner')
+    note: Run script build phase 'Run Script' will be run during every build because the option to run the script phase "Based on dependency analysis" is unchecked. (in target 'Runner' from project 'Runner')
+    note: Run script build phase 'Thin Binary' will be run during every build because the option to run the script phase "Based on dependency analysis" is unchecked. (in target 'Runner' from project 'Runner')
+    note: Run script build phase '[firebase_crashlytics] Crashlytics Upload Symbols' will be run during every build because the option to run the script phase "Based on dependency analysis" is unchecked. (in target 'Runner' from project 'Runner')
+    note: Disabling previews because SWIFT_VERSION is set and SWIFT_OPTIMIZATION_LEVEL=-O, expected -Onone (in target 'PromisesSwift-Promises_Privacy' from project 'Pods')
+    note: Disabling previews because SWIFT_VERSION is set and SWIFT_OPTIMIZATION_LEVEL=-O, expected -Onone (in target 'PromisesSwift' from project 'Pods')
+    note: Disabling previews because SWIFT_VERSION is set and SWIFT_OPTIMIZATION_LEVEL=-O, expected -Onone (in target 'PromisesObjC-FBLPromises_Privacy' from project 'Pods')
+    note: Disabling previews because SWIFT_VERSION is set and SWIFT_OPTIMIZATION_LEVEL=-O, expected -Onone (in target 'PromisesObjC' from project 'Pods')
+    note: Disabling previews because SWIFT_VERSION is set and SWIFT_OPTIMIZATION_LEVEL=-O, expected -Onone (in target 'Pods-Runner' from project 'Pods')
+    note: Disabling previews because SWIFT_VERSION is set and SWIFT_OPTIMIZATION_LEVEL=-O, expected -Onone (in target 'GoogleUtilities-GoogleUtilities_Privacy' from project 'Pods')
+    note: Disabling previews because SWIFT_VERSION is set and SWIFT_OPTIMIZATION_LEVEL=-O, expected -Onone (in target 'GoogleUtilities' from project 'Pods')
+    note: Disabling previews because SWIFT_VERSION is set and SWIFT_OPTIMIZATION_LEVEL=-O, expected -Onone (in target 'GoogleMaps-GoogleMapsResources' from project 'Pods')
+    note: Disabling previews because SWIFT_VERSION is set and SWIFT_OPTIMIZATION_LEVEL=-O, expected -Onone (in target 'GoogleDataTransport-GoogleDataTransport_Privacy' from project 'Pods')
+    note: Disabling previews because SWIFT_VERSION is set and SWIFT_OPTIMIZATION_LEVEL=-O, expected -Onone (in target 'GoogleDataTransport' from project 'Pods')
+    note: Disabling previews because SWIFT_VERSION is set and SWIFT_OPTIMIZATION_LEVEL=-O, expected -Onone (in target 'Google-Maps-iOS-Utils' from project 'Pods')
+    note: Disabling previews because SWIFT_VERSION is set and SWIFT_OPTIMIZATION_LEVEL=-O, expected -Onone (in target 'FirebaseSessions' from project 'Pods')
+    note: Disabling previews because SWIFT_VERSION is set and SWIFT_OPTIMIZATION_LEVEL=-O, expected -Onone (in target 'FirebaseRemoteConfigInterop' from project 'Pods')
+    note: Disabling previews because SWIFT_VERSION is set and SWIFT_OPTIMIZATION_LEVEL=-O, expected -Onone (in target 'FirebaseInstallations-FirebaseInstallations_Privacy' from project 'Pods')
+    note: Disabling previews because SWIFT_VERSION is set and SWIFT_OPTIMIZATION_LEVEL=-O, expected -Onone (in target 'FirebaseInstallations' from project 'Pods')
+    note: Disabling previews because SWIFT_VERSION is set and SWIFT_OPTIMIZATION_LEVEL=-O, expected -Onone (in target 'FirebaseCrashlytics-FirebaseCrashlytics_Privacy' from project 'Pods')
+    note: Disabling previews because SWIFT_VERSION is set and SWIFT_OPTIMIZATION_LEVEL=-O, expected -Onone (in target 'FirebaseCrashlytics' from project 'Pods')
+    note: Disabling previews because SWIFT_VERSION is set and SWIFT_OPTIMIZATION_LEVEL=-O, expected -Onone (in target 'FirebaseCoreInternal-FirebaseCoreInternal_Privacy' from project 'Pods')
+    note: Disabling previews because SWIFT_VERSION is set and SWIFT_OPTIMIZATION_LEVEL=-O, expected -Onone (in target 'FirebaseCoreInternal' from project 'Pods')
+    note: Disabling previews because SWIFT_VERSION is set and SWIFT_OPTIMIZATION_LEVEL=-O, expected -Onone (in target 'FirebaseCoreExtension-FirebaseCoreExtension_Privacy' from project 'Pods')
+    note: Disabling previews because SWIFT_VERSION is set and SWIFT_OPTIMIZATION_LEVEL=-O, expected -Onone (in target 'FirebaseCoreExtension' from project 'Pods')
+    note: Disabling previews because SWIFT_VERSION is set and SWIFT_OPTIMIZATION_LEVEL=-O, expected -Onone (in target 'FirebaseCore-FirebaseCore_Privacy' from project 'Pods')
+    note: Disabling previews because SWIFT_VERSION is set and SWIFT_OPTIMIZATION_LEVEL=-O, expected -Onone (in target 'FirebaseCore' from project 'Pods')
+    note: Disabling previews because SWIFT_VERSION is set and SWIFT_OPTIMIZATION_LEVEL=-O, expected -Onone (in target 'Firebase' from project 'Pods')
+    note: Disabling previews because SWIFT_VERSION is set and SWIFT_OPTIMIZATION_LEVEL=-O, expected -Onone (in target 'Flutter' from project 'Pods')
+
+Encountered error while building for device.
