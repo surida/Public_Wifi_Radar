@@ -31,6 +31,10 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
   bool _showDebugOverlay = true;
   Timer? _debounceTimer;
 
+  // 데이터 출처별 마커 수 (디버그용)
+  int _seoulMarkerCount = 0;
+  int _nationwideMarkerCount = 0;
+
   // 위치 트래킹 관련
   StreamSubscription<Position>? _positionStream;
   LatLng? _currentPosition;
@@ -276,11 +280,39 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
     return text;
   }
 
+  /// 데이터 출처에 따른 마커 아이콘 반환 (디버그 모드에서만 색상 구분)
+  BitmapDescriptor _getMarkerIcon(WifiInfo wifi) {
+    if (!kDebugMode) {
+      return BitmapDescriptor.defaultMarker; // 릴리즈: 기본 빨간색
+    }
+
+    switch (wifi.dataSource) {
+      case WifiDataSource.seoul:
+        return BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue);
+      case WifiDataSource.nationwide:
+        return BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen);
+    }
+  }
+
+  /// 데이터 출처 표시 텍스트 (디버그 모드용)
+  String _getSourcePrefix(WifiDataSource source) {
+    switch (source) {
+      case WifiDataSource.seoul:
+        return '[Seoul] ';
+      case WifiDataSource.nationwide:
+        return '[Gov] ';
+    }
+  }
+
   void _createMarkers({LatLng? center}) {
     if (_wifiList.isEmpty) return;
 
     final markers = <Marker>{};
     _markerIdToWifi.clear();
+
+    // 출처별 카운터 초기화
+    int seoulCount = 0;
+    int nationwideCount = 0;
 
     // 중심 좌표가 있으면 거리순 정렬
     if (center != null) {
@@ -312,20 +344,37 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
 
       _markerIdToWifi[markerId.value] = wifi;
 
+      // 출처별 카운터 증가
+      if (wifi.dataSource == WifiDataSource.seoul) {
+        seoulCount++;
+      } else {
+        nationwideCount++;
+      }
+
+      // 디버그 모드에서만 출처 prefix 추가
+      final snippetText = kDebugMode
+          ? '${_getSourcePrefix(wifi.dataSource)}${_getLocalizedText(wifi.detailedAddress)}'
+          : _getLocalizedText(wifi.detailedAddress);
+
       final marker = Marker(
         markerId: markerId,
         clusterManagerId: _clusterManagerId,
         position: LatLng(wifi.lat, wifi.lng),
+        icon: _getMarkerIcon(wifi),
         infoWindow: InfoWindow(
           title: _getLocalizedText(wifi.installationPlace),
-          snippet: _getLocalizedText(wifi.detailedAddress),
+          snippet: snippetText,
         ),
       );
       markers.add(marker);
     }
 
+    // 출처별 카운터 저장
+    _seoulMarkerCount = seoulCount;
+    _nationwideMarkerCount = nationwideCount;
+
     LogService().log(
-      "Updated markers: $count items (Center: ${center?.latitude}, ${center?.longitude})",
+      "Updated markers: $count items (Seoul: $seoulCount, Gov: $nationwideCount) (Center: ${center?.latitude}, ${center?.longitude})",
     );
 
     if (mounted) {
@@ -344,8 +393,16 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
           AppLocalizations.of(context)!.appTitle,
           style: const TextStyle(
             color: Colors.white,
-            fontWeight: FontWeight.w600,
-            shadows: [Shadow(color: Colors.black26, blurRadius: 2)],
+            fontWeight: FontWeight.bold,
+            fontSize: 20,
+            shadows: [
+              Shadow(
+                color: Colors.black54,
+                blurRadius: 4,
+                offset: Offset(1, 1),
+              ),
+              Shadow(color: Colors.black26, blurRadius: 8),
+            ],
           ),
         ),
         backgroundColor: Colors.transparent,
@@ -356,8 +413,8 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
               colors: [
-                Colors.blue.shade700.withValues(alpha: 0.9),
-                Colors.blue.shade500.withValues(alpha: 0.6),
+                Colors.black.withValues(alpha: 0.8),
+                Colors.black.withValues(alpha: 0.4),
                 Colors.transparent,
               ],
             ),
@@ -470,6 +527,15 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
                     Text(
                       '📍 Markers: ${_markers.length}/${_getMarkerCountForZoom(_currentZoom)}',
                       style: const TextStyle(color: Colors.white, fontSize: 12),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      '   🔵 Seoul: $_seoulMarkerCount',
+                      style: const TextStyle(color: Colors.lightBlue, fontSize: 11),
+                    ),
+                    Text(
+                      '   🟢 Gov: $_nationwideMarkerCount',
+                      style: const TextStyle(color: Colors.lightGreen, fontSize: 11),
                     ),
                   ],
                 ),

@@ -21,6 +21,7 @@ class CsvService {
       final seoulStopwatch = Stopwatch()..start();
       final seoulData = await _loadSingleFile(
         'assets/csv/seoul_public_wifi_data.csv',
+        WifiDataSource.seoul,
       );
       seoulStopwatch.stop();
       allWifiList.addAll(seoulData);
@@ -33,6 +34,7 @@ class CsvService {
       final otherStopwatch = Stopwatch()..start();
       final otherData = await _loadSingleFile(
         'assets/csv/public_wifi_data.csv',
+        WifiDataSource.nationwide,
       );
       otherStopwatch.stop();
       if (!kDebugMode) {
@@ -62,7 +64,10 @@ class CsvService {
     }
   }
 
-  Future<List<WifiInfo>> _loadSingleFile(String assetPath) async {
+  Future<List<WifiInfo>> _loadSingleFile(
+    String assetPath,
+    WifiDataSource source,
+  ) async {
     try {
       // Load raw bytes from asset
       final ByteData rawBytes = await rootBundle.load(assetPath);
@@ -105,7 +110,7 @@ class CsvService {
           }
         }
         try {
-          wifiList.add(WifiInfo.fromCsv(rows[i]));
+          wifiList.add(WifiInfo.fromCsv(rows[i], source: source));
         } catch (e) {
           // Skip invalid rows
           continue;
