@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:public_wifi_radar/models/wifi_info.dart';
@@ -195,7 +196,40 @@ class _MapScreenState extends State<MapScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Public WiFi Radar')),
+      extendBodyBehindAppBar: true,
+      appBar: AppBar(
+        title: const Text(
+          'Public WiFi Radar',
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.w600,
+            shadows: [Shadow(color: Colors.black26, blurRadius: 2)],
+          ),
+        ),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                Colors.blue.shade700.withValues(alpha: 0.9),
+                Colors.blue.shade500.withValues(alpha: 0.6),
+                Colors.transparent,
+              ],
+            ),
+          ),
+        ),
+        systemOverlayStyle: SystemUiOverlayStyle.light,
+        iconTheme: const IconThemeData(color: Colors.white),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.info_outline),
+            onPressed: _showInfoDialog,
+          ),
+        ],
+      ),
       floatingActionButton: kDebugMode
           ? FloatingActionButton.small(
               onPressed: () =>
@@ -215,8 +249,10 @@ class _MapScreenState extends State<MapScreen> {
           GoogleMap(
             mapType: MapType.normal,
             initialCameraPosition: _kGooglePlex,
-            minMaxZoomPreference:
-                const MinMaxZoomPreference(_minZoomLevel, _maxZoomLevel),
+            minMaxZoomPreference: const MinMaxZoomPreference(
+              _minZoomLevel,
+              _maxZoomLevel,
+            ),
             myLocationEnabled: true,
             myLocationButtonEnabled: true,
             markers: _markers,
@@ -248,7 +284,7 @@ class _MapScreenState extends State<MapScreen> {
           // Debug overlay (Debug 빌드에서만 표시)
           if (kDebugMode && _showDebugOverlay)
             Positioned(
-              top: 10,
+              top: MediaQuery.of(context).padding.top + kToolbarHeight + 10,
               left: 10,
               child: Container(
                 padding: const EdgeInsets.all(12),
@@ -280,6 +316,34 @@ class _MapScreenState extends State<MapScreen> {
             ),
         ],
       ),
+    );
+  }
+
+  void _showInfoDialog() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('App Info'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: const [
+              Text('📡 Data Source: Public Data Portal (data.go.kr)'),
+              SizedBox(height: 8),
+              Text('📲 Version: 1.0.0'),
+              SizedBox(height: 8),
+              Text('📧 Contact: contact@publicwifiradar.com'),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Close'),
+            ),
+          ],
+        );
+      },
     );
   }
 }
