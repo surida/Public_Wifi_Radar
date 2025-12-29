@@ -17,11 +17,12 @@ class MapScreen extends StatefulWidget {
   State<MapScreen> createState() => _MapScreenState();
 }
 
-class _MapScreenState extends State<MapScreen> {
+class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
   final Completer<GoogleMapController> _controllerCompleter = Completer();
 
   Set<Marker> _markers = {};
   Set<ClusterManager> _clusterManagers = {};
+  Set<Circle> _circles = {};
   List<WifiInfo> _wifiList = [];
   final Map<String, WifiInfo> _markerIdToWifi = {};
 
@@ -29,6 +30,16 @@ class _MapScreenState extends State<MapScreen> {
   double _currentZoom = 16.0;
   bool _showDebugOverlay = true;
   Timer? _debounceTimer;
+
+  // 위치 트래킹 관련
+  StreamSubscription<Position>? _positionStream;
+  LatLng? _currentPosition;
+  bool _isTracking = true;
+  bool _hasLocationPermission = false;
+
+  // 펄스 애니메이션 관련
+  late AnimationController _pulseController;
+  late Animation<double> _pulseAnimation;
 
   // Default camera position (Seoul)
   static const CameraPosition _kGooglePlex = CameraPosition(
@@ -55,8 +66,32 @@ class _MapScreenState extends State<MapScreen> {
   @override
   void initState() {
     super.initState();
+    _initPulseAnimation();
     _initClusterManager();
     _initializeData();
+  }
+
+  void _initPulseAnimation() {
+    _pulseController = AnimationController(
+      duration: const Duration(milliseconds: 1500),
+      vsync: this,
+    )..repeat(reverse: true);
+
+    _pulseAnimation = Tween<double>(begin: 1.0, end: 2.5).animate(
+      CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
+    );
+
+    _pulseAnimation.addListener(() {
+      _updateLocationCircles();
+    });
+  }
+
+  @override
+  void dispose() {
+    _pulseController.dispose();
+    _positionStream?.cancel();
+    _debounceTimer?.cancel();
+    super.dispose();
   }
 
   void _initClusterManager() {
@@ -112,7 +147,8 @@ class _MapScreenState extends State<MapScreen> {
         return;
       }
 
-      // 3. Get Current Location
+      // 3. Get Current Location and Start Tracking
+      _hasLocationPermission = true;
       LogService().log("Getting location...");
       Position position = await Geolocator.getCurrentPosition(
         locationSettings: const LocationSettings(
@@ -124,9 +160,16 @@ class _MapScreenState extends State<MapScreen> {
       );
 
       final currentLoc = LatLng(position.latitude, position.longitude);
+      setState(() {
+        _currentPosition = currentLoc;
+      });
+
       _controllerCompleter.future.then((controller) {
         controller.animateCamera(CameraUpdate.newLatLng(currentLoc));
       });
+
+      // 4. Start Position Stream for Real-time Tracking
+      _startPositionStream();
     } catch (e) {
       LogService().log("Location Error/Timeout: $e");
     } finally {
@@ -134,6 +177,96 @@ class _MapScreenState extends State<MapScreen> {
         setState(() => _isLoading = false);
       }
     }
+  }
+
+  void _startPositionStream() {
+    _positionStream =
+        Geolocator.getPositionStream(
+          locationSettings: const LocationSettings(
+            accuracy: LocationAccuracy.high,
+            distanceFilter: 10, // 10미터 이동 시마다 업데이트
+          ),
+        ).listen((Position position) {
+          if (!mounted) return;
+
+          final newPosition = LatLng(position.latitude, position.longitude);
+          setState(() {
+            _currentPosition = newPosition;
+          });
+
+          LogService().log(
+            "Position updated: ${position.latitude}, ${position.longitude}",
+          );
+
+          // 트래킹 모드일 때만 카메라 이동
+          if (_isTracking) {
+            _controllerCompleter.future.then((controller) {
+              controller.animateCamera(CameraUpdate.newLatLng(newPosition));
+            });
+          }
+        });
+  }
+
+  void _updateLocationCircles() {
+    // 트래킹 모드가 아니면 펄스 원 숨김 (기본 파란 점 사용)
+    if (!_isTracking || _currentPosition == null || !_hasLocationPermission) {
+      if (_circles.isNotEmpty) {
+        setState(() {
+          _circles = {};
+        });
+      }
+      return;
+    }
+
+    // 줌 레벨에 따른 원 크기 조절 (미터 단위)
+    final baseRadius = _currentZoom >= 16 ? 30.0 : 60.0;
+    final pulseRadius = baseRadius * _pulseAnimation.value;
+
+    setState(() {
+      _circles = {
+        // 바깥 펄스 원 (투명 파랑)
+        Circle(
+          circleId: const CircleId('pulse_outer'),
+          center: _currentPosition!,
+          radius: pulseRadius,
+          fillColor: Colors.blue.withValues(alpha: 0.15),
+          strokeWidth: 0,
+        ),
+        // 안쪽 고정 원 (진한 파랑)
+        Circle(
+          circleId: const CircleId('location_inner'),
+          center: _currentPosition!,
+          radius: baseRadius * 0.4,
+          fillColor: Colors.blue,
+          strokeColor: Colors.white,
+          strokeWidth: 3,
+        ),
+      };
+    });
+  }
+
+  void _toggleTracking() {
+    setState(() {
+      _isTracking = !_isTracking;
+    });
+
+    if (_isTracking) {
+      // 트래킹 활성화: 애니메이션 시작 + 현재 위치로 이동
+      _pulseController.repeat(reverse: true);
+      if (_currentPosition != null) {
+        _controllerCompleter.future.then((controller) {
+          controller.animateCamera(CameraUpdate.newLatLng(_currentPosition!));
+        });
+      }
+    } else {
+      // 트래킹 비활성화: 애니메이션 멈추고 원 숨김
+      _pulseController.stop();
+      setState(() {
+        _circles = {};
+      });
+    }
+
+    LogService().log("Tracking ${_isTracking ? 'enabled' : 'disabled'}");
   }
 
   String _getLocalizedText(String text) {
@@ -223,8 +356,8 @@ class _MapScreenState extends State<MapScreen> {
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
               colors: [
-                Colors.blue.shade700.withOpacity(0.9),
-                Colors.blue.shade500.withOpacity(0.6),
+                Colors.blue.shade700.withValues(alpha: 0.9),
+                Colors.blue.shade500.withValues(alpha: 0.6),
                 Colors.transparent,
               ],
             ),
@@ -239,8 +372,25 @@ class _MapScreenState extends State<MapScreen> {
           ),
         ],
       ),
-      floatingActionButton: kDebugMode
-          ? FloatingActionButton.small(
+      floatingActionButton: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // 트래킹 토글 버튼
+          if (_hasLocationPermission)
+            FloatingActionButton.small(
+              heroTag: 'tracking',
+              onPressed: _toggleTracking,
+              backgroundColor: _isTracking ? Colors.blue : Colors.grey,
+              child: Icon(
+                _isTracking ? Icons.my_location : Icons.location_disabled,
+                color: Colors.white,
+              ),
+            ),
+          if (_hasLocationPermission) const SizedBox(height: 8),
+          // 디버그 토글 버튼 (Debug 빌드에서만)
+          if (kDebugMode)
+            FloatingActionButton.small(
+              heroTag: 'debug',
               onPressed: () =>
                   setState(() => _showDebugOverlay = !_showDebugOverlay),
               backgroundColor: Colors.black54,
@@ -250,8 +400,9 @@ class _MapScreenState extends State<MapScreen> {
                     : Icons.bug_report_outlined,
                 color: Colors.white,
               ),
-            )
-          : null,
+            ),
+        ],
+      ),
       floatingActionButtonLocation: FloatingActionButtonLocation.startFloat,
       body: Stack(
         children: [
@@ -265,6 +416,7 @@ class _MapScreenState extends State<MapScreen> {
             myLocationEnabled: true,
             myLocationButtonEnabled: true,
             markers: _markers,
+            circles: _circles,
             clusterManagers: _clusterManagers,
             onMapCreated: (GoogleMapController controller) {
               _controllerCompleter.complete(controller);
@@ -298,7 +450,7 @@ class _MapScreenState extends State<MapScreen> {
               child: Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.7),
+                  color: Colors.black.withValues(alpha: 0.7),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Column(
