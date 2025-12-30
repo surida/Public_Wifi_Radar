@@ -470,6 +470,8 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
               _minZoomLevel,
               _maxZoomLevel,
             ),
+            // 내 위치 버튼 위치 조정 (하단 여백 추가)
+            padding: const EdgeInsets.only(bottom: 50),
             myLocationEnabled: true,
             myLocationButtonEnabled: true,
             markers: _markers,
