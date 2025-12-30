@@ -1,4 +1,4 @@
-package com.example.public_wifi_radar
+package surida.PublicWifiRadar
 
 import io.flutter.embedding.android.FlutterActivity
 
