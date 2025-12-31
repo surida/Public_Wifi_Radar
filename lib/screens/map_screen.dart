@@ -38,8 +38,9 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
   // 위치 트래킹 관련
   StreamSubscription<Position>? _positionStream;
   LatLng? _currentPosition;
-  bool _isTracking = true;
+  bool _isTracking = false; // 초기 상태: 트래킹 OFF
   bool _hasLocationPermission = false;
+  bool _isUserDragging = false; // 사용자 드래그 감지용
 
   // 펄스 애니메이션 관련
   late AnimationController _pulseController;
@@ -249,28 +250,40 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
     });
   }
 
-  void _toggleTracking() {
-    setState(() {
-      _isTracking = !_isTracking;
-    });
+  /// 위치 버튼 탭: 트래킹 토글
+  void _onLocationButtonTap() {
+    if (_currentPosition == null) return;
 
+    // 트래킹 중이면 OFF, 아니면 ON
     if (_isTracking) {
-      // 트래킹 활성화: 애니메이션 시작 + 현재 위치로 이동
-      _pulseController.repeat(reverse: true);
-      if (_currentPosition != null) {
-        _controllerCompleter.future.then((controller) {
-          controller.animateCamera(CameraUpdate.newLatLng(_currentPosition!));
-        });
-      }
+      _disableTracking();
+      LogService().log("Tracking disabled - button tapped");
     } else {
-      // 트래킹 비활성화: 애니메이션 멈추고 원 숨김
-      _pulseController.stop();
       setState(() {
-        _circles = {};
+        _isTracking = true;
       });
-    }
 
-    LogService().log("Tracking ${_isTracking ? 'enabled' : 'disabled'}");
+      // 애니메이션 시작 + 현재 위치로 이동
+      _pulseController.repeat(reverse: true);
+      _controllerCompleter.future.then((controller) {
+        controller.animateCamera(CameraUpdate.newLatLng(_currentPosition!));
+      });
+
+      LogService().log("Tracking enabled - moved to current location");
+    }
+  }
+
+  /// 트래킹 비활성화 (지도 드래그 시 호출)
+  void _disableTracking() {
+    if (!_isTracking) return;
+
+    setState(() {
+      _isTracking = false;
+      _circles = {};
+    });
+    _pulseController.stop();
+
+    LogService().log("Tracking disabled - user dragged map");
   }
 
   String _getLocalizedText(String text) {
@@ -432,15 +445,15 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
       floatingActionButton: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          // 트래킹 토글 버튼
+          // 위치 버튼 (1탭 = 트래킹 ON + 현재 위치 이동)
           if (_hasLocationPermission)
             FloatingActionButton.small(
-              heroTag: 'tracking',
-              onPressed: _toggleTracking,
-              backgroundColor: _isTracking ? Colors.blue : Colors.grey,
+              heroTag: 'location',
+              onPressed: _onLocationButtonTap,
+              backgroundColor: _isTracking ? Colors.blue : Colors.white,
               child: Icon(
-                _isTracking ? Icons.my_location : Icons.location_disabled,
-                color: Colors.white,
+                _isTracking ? Icons.my_location : Icons.location_searching,
+                color: _isTracking ? Colors.white : Colors.grey[700],
               ),
             ),
           if (_hasLocationPermission) const SizedBox(height: 8),
@@ -460,7 +473,7 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
             ),
         ],
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.startFloat,
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       body: Stack(
         children: [
           GoogleMap(
@@ -470,20 +483,24 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
               _minZoomLevel,
               _maxZoomLevel,
             ),
-            // 내 위치 버튼 위치 조정 (하단 여백 추가)
-            padding: const EdgeInsets.only(bottom: 50),
             myLocationEnabled: true,
-            myLocationButtonEnabled: true,
+            myLocationButtonEnabled: false, // 커스텀 버튼 사용
             markers: _markers,
             circles: _circles,
             clusterManagers: _clusterManagers,
             onMapCreated: (GoogleMapController controller) {
               _controllerCompleter.complete(controller);
             },
+            onCameraMoveStarted: () {
+              // 사용자가 지도를 드래그하기 시작하면 트래킹 해제
+              _isUserDragging = true;
+              _disableTracking();
+            },
             onCameraMove: (CameraPosition position) {
               _currentZoom = position.zoom;
             },
             onCameraIdle: () {
+              _isUserDragging = false;
               _debounceTimer?.cancel();
               _debounceTimer = Timer(
                 const Duration(milliseconds: 500),

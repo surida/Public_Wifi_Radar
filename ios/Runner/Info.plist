@@ -28,12 +28,12 @@
 	<true/>
 	<key>LSSupportsOpeningDocumentsInPlace</key>
 	<true/>
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>내 주변 공공 와이파이 정보를 지도에 표시하기 위해 현재 위치가 필요합니다.</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
 	<string>내 주변 공공 와이파이 정보를 찾기 위해 현재 위치가 필요합니다.</string>
 	<key>NSLocationAlwaysUsageDescription</key>
 	<string>내 주변 공공 와이파이 정보를 찾기 위해 현재 위치가 필요합니다.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>내 주변 공공 와이파이 정보를 지도에 표시하기 위해 현재 위치가 필요합니다.</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>UIFileSharingEnabled</key>
