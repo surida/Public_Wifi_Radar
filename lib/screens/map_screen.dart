@@ -41,6 +41,7 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
   bool _isTracking = false; // 초기 상태: 트래킹 OFF
   bool _hasLocationPermission = false;
   bool _isUserDragging = false; // 사용자 드래그 감지용
+  bool _isProgrammaticMove = false; // 코드에 의한 이동 여부
 
   // 펄스 애니메이션 관련
   late AnimationController _pulseController;
@@ -205,9 +206,23 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
 
           // 트래킹 모드일 때만 카메라 이동
           if (_isTracking) {
+            LogService().log(
+              "Updating camera to new position: $newPosition. Tracking is ON.",
+            );
+            _isProgrammaticMove = true;
             _controllerCompleter.future.then((controller) {
-              controller.animateCamera(CameraUpdate.newLatLng(newPosition));
+              controller
+                  .animateCamera(CameraUpdate.newLatLng(newPosition))
+                  .then((_) {
+                    LogService().log("Camera animation completed");
+                    // 애니메이션 종료 직후 발생하는 잔여 이벤트 무시를 위해 지연
+                    Future.delayed(const Duration(milliseconds: 500), () {
+                      if (mounted) _isProgrammaticMove = false;
+                    });
+                  });
             });
+          } else {
+            LogService().log("Tracking is OFF. Not moving camera.");
           }
         });
   }
@@ -265,8 +280,15 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
 
       // 애니메이션 시작 + 현재 위치로 이동
       _pulseController.repeat(reverse: true);
+      _isProgrammaticMove = true;
       _controllerCompleter.future.then((controller) {
-        controller.animateCamera(CameraUpdate.newLatLng(_currentPosition!));
+        controller
+            .animateCamera(CameraUpdate.newLatLng(_currentPosition!))
+            .then((_) {
+              Future.delayed(const Duration(milliseconds: 500), () {
+                if (mounted) _isProgrammaticMove = false;
+              });
+            });
       });
 
       LogService().log("Tracking enabled - moved to current location");
@@ -492,6 +514,15 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
               _controllerCompleter.complete(controller);
             },
             onCameraMoveStarted: () {
+              if (_isProgrammaticMove) {
+                LogService().log(
+                  "Camera move started (Programmatic). Tracking preserved.",
+                );
+                return;
+              }
+              LogService().log(
+                "Camera move started. isUserDragging: $_isUserDragging",
+              );
               // 사용자가 지도를 드래그하기 시작하면 트래킹 해제
               _isUserDragging = true;
               _disableTracking();
@@ -550,11 +581,17 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
                     const SizedBox(height: 4),
                     Text(
                       '   🔵 Seoul: $_seoulMarkerCount',
-                      style: const TextStyle(color: Colors.lightBlue, fontSize: 11),
+                      style: const TextStyle(
+                        color: Colors.lightBlue,
+                        fontSize: 11,
+                      ),
                     ),
                     Text(
                       '   🟢 Gov: $_nationwideMarkerCount',
-                      style: const TextStyle(color: Colors.lightGreen, fontSize: 11),
+                      style: const TextStyle(
+                        color: Colors.lightGreen,
+                        fontSize: 11,
+                      ),
                     ),
                   ],
                 ),
