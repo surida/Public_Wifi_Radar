@@ -22,7 +22,6 @@ class _MapScreenState extends State<MapScreen> {
 
   Set<Marker> _markers = {};
   Set<ClusterManager> _clusterManagers = {};
-  Set<Circle> _circles = {};
   List<WifiInfo> _wifiList = [];
   final Map<String, WifiInfo> _markerIdToWifi = {};
 
@@ -174,38 +173,9 @@ class _MapScreenState extends State<MapScreen> {
       setState(() {
         _currentPosition = newPosition;
       });
-      _updateLocationCircle();
-
       LogService().log(
         "Position updated: ${position.latitude}, ${position.longitude}",
       );
-    });
-  }
-
-  void _updateLocationCircle() {
-    if (_currentPosition == null || !_hasLocationPermission) {
-      if (_circles.isNotEmpty) {
-        setState(() {
-          _circles = {};
-        });
-      }
-      return;
-    }
-
-    // 줌 레벨에 따른 원 크기 조절 (미터 단위)
-    final baseRadius = _currentZoom >= 16 ? 15.0 : 30.0;
-
-    setState(() {
-      _circles = {
-        Circle(
-          circleId: const CircleId('location'),
-          center: _currentPosition!,
-          radius: baseRadius,
-          fillColor: Colors.blue,
-          strokeColor: Colors.white,
-          strokeWidth: 3,
-        ),
-      };
     });
   }
 
@@ -417,10 +387,9 @@ class _MapScreenState extends State<MapScreen> {
               _minZoomLevel,
               _maxZoomLevel,
             ),
-            myLocationEnabled: false,
+            myLocationEnabled: _hasLocationPermission,
             myLocationButtonEnabled: false,
             markers: _markers,
-            circles: _circles,
             clusterManagers: _clusterManagers,
             onMapCreated: (GoogleMapController controller) {
               _controllerCompleter.complete(controller);
